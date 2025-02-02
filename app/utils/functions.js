@@ -8,6 +8,8 @@ const {
 const createHttpError = require("http-errors");
 const redisClient = require("./init_redis");
 const { CategryModel } = require("../models/categories");
+const path = require("path");
+const fs = require("fs");
 function randomNumberGenerator() {
   return randomInt(10000, 99999);
 }
@@ -18,7 +20,7 @@ function SignAccessToken(userId) {
       mobile: user.mobile,
     };
     const options = {
-      expiresIn: "1h",
+      expiresIn: "1y",
     };
     Jwt.sign(payload, ACCESS_TOKEN_SECRET_KEY, options, (err, token) => {
       if (err) reject(createHttpError.InternalServerError("خطای سرور داخلی"));
@@ -61,11 +63,48 @@ async function existCategory(title) {
   if (category) throw createHttpError.BadRequest("کتگوری با این نام وجود دارد");
   return null;
 }
-
+function deleteFileInPublic(fileAddress) {
+  if (fileAddress) {
+    const pathFile = path.join(__dirname, "..", "..", "public", fileAddress);
+    fs.unlinkSync(pathFile);
+  }
+}
+function ListOfImagesFromRequest(files, fileUploadPath) {
+  if (files?.length > 0) {
+    return files
+      .map((file) => path.join(fileUploadPath, file.filename))
+      .map((item) => item.replace(/\\/g, "/"));
+  } else {
+    return [];
+  }
+}
+function setFeatures(body) {
+  const { colors, width, weight, height, length } = body;
+  let features = {};
+  features.colors = colors;
+  if (!isNaN(+width) || !isNaN(+height) || !isNaN(+weight) || !isNaN(+length)) {
+    if (!width) features.width = 0;
+    else features.width = +width;
+    if (!height) features.height = 0;
+    else features.height = +height;
+    if (!weight) features.weight = 0;
+    else features.weight = +weight;
+    if (!length) features.length = 0;
+    else features.length = +length;
+  }
+  return features;
+}
+function copyObject(object) {
+  return JSON.parse(JSON.stringify(object));
+}
 module.exports = {
   randomNumberGenerator,
   SignAccessToken,
   SignRefreshToken,
   VerifyRefreshToken,
   existCategory,
+  deleteFileInPublic,
+  ListOfImagesFromRequest,
+  setFeatures,
+  copyObject,
 };

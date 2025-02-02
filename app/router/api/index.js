@@ -30,7 +30,7 @@ const router = require("express").Router();
  *          404:
  *              description: not Found
  */
-router.get("/", VerifyAccessToken, homeController.indexPage);
+router.get("/", homeController.indexPage);
 module.exports = {
   HomeRoutes: router,
 };

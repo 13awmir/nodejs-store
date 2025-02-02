@@ -10,6 +10,13 @@ const addCategorySchema = Joi.object({
     .pattern(MONGODBID)
     .error(new Error("والد انتخاب شده صحیح نمیباشد")),
 });
+const updateCategorySchema = Joi.object({
+  title: Joi.string()
+    .min(3)
+    .max(30)
+    .error(new Error("نام وارد شده صحیح نمیباشد")),
+});
 module.exports = {
   addCategorySchema,
+  updateCategorySchema,
 };
