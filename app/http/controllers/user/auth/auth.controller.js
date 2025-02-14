@@ -22,8 +22,8 @@ class userAuthController extends Controller {
       const result = await this.saveUser(mobile, code);
       if (!result) throw createHttpError.Unauthorized("ورود شما انجام نشد");
       return res.status(HttpStatus.OK).send({
+        statusCode: HttpStatus.OK,
         data: {
-          statusCode: HttpStatus.OK,
           message: "کد اعتبار سنجی ارسال شد",
           code,
           mobile,

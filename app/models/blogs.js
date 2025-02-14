@@ -9,7 +9,11 @@ const Schema = new mongoose.Schema(
     short_text: { type: String, required: true },
     image: { type: String, required: true },
     tags: { type: [String], default: [] },
-    category: { type: [mongoose.Types.ObjectId], required: true },
+    category: {
+      type: [mongoose.Types.ObjectId],
+      ref: "category",
+      required: true,
+    },
     comments: { type: [CommentSchema], default: [] },
     like: { type: [mongoose.Types.ObjectId], ref: "users", default: [] },
     dislike: { type: [mongoose.Types.ObjectId], ref: "users", default: [] },
@@ -33,7 +37,9 @@ Schema.virtual("category_detail", {
   localField: "_id",
   foreignField: "category",
 });
-
+Schema.virtual("imageURL").get(function () {
+  return `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${this.image}`;
+});
 module.exports = {
   BlogModel: mongoose.model("blog", Schema),
 };

@@ -18,7 +18,7 @@ function creatRoute(req) {
     month,
     day
   );
-  req.body.fileUploadPath = path.join("uploads", "blogs", year, month, day);
+  req.body.fileUploadPath = path.join("uploads", "blogs", year, month, day).replace(/\\/g, "/");
   fs.mkdirSync(directory, { recursive: true });
   return directory;
 }
@@ -42,12 +42,27 @@ function fileFilter(req, file, cb) {
   }
   return cb(createHttpError.BadRequest("فرمت تصویر ارسال شده صحیح نمیباشد"));
 }
+function videoFilter(req, file, cb) {
+  const ext = path.extname(file.originalname);
+  const mimtypes = [".mp4", ".mpg", ".avi", ".mkv"];
+  if (mimtypes.includes(ext)) {
+    return cb(null, true);
+  }
+  return cb(createHttpError.BadRequest("فرمت ویدو ارسال شده صحیح نمیباشد"));
+}
 const maxSize = 1 * 1000 * 1000;
+const maxVideoSize = 300 * 1000 * 1000;
 const uploadFile = multer({
   storage,
   fileFilter,
   limits: { fileSize: maxSize },
 });
+const uploadVideo = multer({
+  storage,
+  videoFilter,
+  limits: { fileSize: maxVideoSize },
+});
 module.exports = {
   uploadFile,
+  uploadVideo,
 };
